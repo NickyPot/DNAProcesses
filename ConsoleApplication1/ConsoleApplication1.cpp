@@ -234,8 +234,15 @@ int main() {
 	fstream dnaFile;
 	dnaFile.open("dna.txt");
 	string dnaStrand;
-	dnaFile >> dnaStrand;
-	findTemplateStrand(dnaStrand);
+	string dnaStrand2;
+	while (getline(dnaFile, dnaStrand)) {
+		
+		
+		dnaStrand2 = dnaStrand2 + dnaStrand;
+		
+	}
+	dnaFile.close();
+	findTemplateStrand(dnaStrand2);
 	
 	string stringTemplateStrand(templateStrand.begin(), templateStrand.end());
 	findMRna(stringTemplateStrand);
@@ -243,24 +250,34 @@ int main() {
 	string stringMRna(mRna.begin(), mRna.end());
 	
 	findProtein(stringMRna);
+	
+	
 
 
+	fstream dnaOutput("dnaOut.txt");
+
+	dnaOutput << "The template strand is: ";
 	for (auto i = templateStrand.begin(); i != templateStrand.end(); i++) {
 	
-		cout << *i << "";
+		dnaOutput << *i << "";
 	}
 
-	cout << "\n  \n";
+	dnaOutput << "\n  \n";
 	
+
+	dnaOutput << "The mRna strand is: ";
 	for (auto i = mRna.begin(); i != mRna.end(); i++) {
 
-		cout << *i << "";
+		dnaOutput << *i << "";
 	}
 
 
+	dnaOutput << "\n  \n";
+
+	dnaOutput << "The protein strand is: ";
 	for (auto i = protein.begin(); i != protein.end(); i++) {
 
-		cout << *i << "";
+		dnaOutput << *i << "";
 	}
 
 
