@@ -14,18 +14,16 @@ using namespace std::chrono;
 using namespace std;
 using std::thread;
 //mutex for template strand
-mutex mutex_;
-//temporary string for template strand that is use to combine all themplate strands from the threads
-string finalTemplateStrand[3];
+mutex mutex_protein;
 
-//vector<condition_variable> t;
-//vector <char> templateStrand;
-vector <char> mRna;
+
 vector <string> protein;
 
 
+
+
 //this will run at the same time as the findMRna function
-string findTemplateStrand(string codingStrand, int iteration, int numberOfBases, int whichThread) {
+string findCodingStrand(string templateStrand, int iteration, int numberOfBases, int whichThread) {
 
 	//this is only used within the thread function, as a stepping stone to the global variable
 	vector <char> threadedTemplateStrand;
@@ -34,7 +32,7 @@ string findTemplateStrand(string codingStrand, int iteration, int numberOfBases,
 	//goes through coding strand and turns it into the template strand
 	for (; iteration < numberOfBases; iteration++)
 	{
-		switch (codingStrand[iteration])
+		switch (templateStrand[iteration])
 		{
 		case 'a': threadedTemplateStrand.push_back('t');
 			break;
@@ -53,14 +51,39 @@ string findTemplateStrand(string codingStrand, int iteration, int numberOfBases,
 	//turns the vector char template strand into a string, in order to put it in the global string array for the template strand
 	string threadedTempStrand(threadedTemplateStrand.begin(), threadedTemplateStrand.end());
 
-	//lock the global variable
-	mutex_.lock();
-	//puts in the part of the template strand, in the place according to which thread is submitting it
-	finalTemplateStrand[whichThread] = threadedTempStrand;
-	//unlock the variable
-	mutex_.unlock();
+	
 
 	return threadedTempStrand;
+}
+
+
+
+
+string findMRna(string templateStrand, int iteration, int numberOfBases) {
+
+	vector <char> threadedMRna;
+	
+
+	//goes through template strand and turns it into mRNA
+	for ( ; iteration < numberOfBases; iteration++)
+	{
+		switch (templateStrand[iteration])
+		{
+		case 'a': threadedMRna.push_back('u');
+			break;
+		case 't': threadedMRna.push_back('a');
+			break;
+		case 'g': threadedMRna.push_back('c');
+			break;
+		case 'c': threadedMRna.push_back('g');
+			break;
+
+		}
+			   		 
+	}
+
+	string threadedMRnaInString(threadedMRna.begin(), threadedMRna.end());
+	return threadedMRnaInString;
 }
 
 
@@ -70,7 +93,7 @@ string findTemplateStrand(string codingStrand, int iteration, int numberOfBases,
 
 int main() {
 
-	int fff = thread::hardware_concurrency();
+	//int fff = thread::hardware_concurrency();
 	fstream dnaFile;
 	dnaFile.open("dna.txt");
 	string dnaStrand;
@@ -101,7 +124,7 @@ int main() {
 	
 		maxBase = maxBase + basesJump;
 		int startingPos = basesJump * i;
-		codingStrandsFromThreads.push_back(async(findTemplateStrand, dnaStrand2, startingPos, maxBase, i));
+		codingStrandsFromThreads.push_back(async(findMRna, dnaStrand2, startingPos, maxBase));
 	
 	
 	}
@@ -121,7 +144,7 @@ int main() {
 	
 	cout << duration.count();
 
-	cout << fff;
+	//cout << fff;
 
 	
 	
